@@ -7,9 +7,10 @@ function App() {
   const [map] = useState(generateMap());
   const [playerX, setPlayerX] = useState(7); // Start in the Middle
   const [playerY, setPlayerY] = useState(7);
-  const [selectedSection, setSelectedSection] = useState('map'); // 'map' or 'story'
+  const [selectedPanel, setSelectedPanel] = useState(0); // 0=map, 1=stats, 2=story
   const [showMovementMenu, setShowMovementMenu] = useState(false);
-  const [selectedDirection, setSelectedDirection] = useState(0); // 0-7 for 8 directions
+  const [selectedDirection, setSelectedDirection] = useState(0); // 0-8 (8 directions + cancel)
+  const [isStoryScrollMode, setIsStoryScrollMode] = useState(false); // true when scrolling story
   const [storyHistory, setStoryHistory] = useState([]);
   const [moveCount, setMoveCount] = useState(0);
   
@@ -30,7 +31,7 @@ function App() {
     }]);
   }, []);
 
-  // Directions: N, NE, E, SE, S, SW, W, NW
+  // Directions: N, NE, E, SE, S, SW, W, NW, Cancel
   const directions = [
     { name: 'N', dx: 0, dy: -1 },
     { name: 'NE', dx: 1, dy: -1 },
@@ -39,7 +40,8 @@ function App() {
     { name: 'S', dx: 0, dy: 1 },
     { name: 'SW', dx: -1, dy: 1 },
     { name: 'W', dx: -1, dy: 0 },
-    { name: 'NW', dx: -1, dy: -1 }
+    { name: 'NW', dx: -1, dy: -1 },
+    { name: 'X', dx: null, dy: null } // Cancel option
   ];
 
   // Count terrain types in visible area
@@ -83,6 +85,12 @@ function App() {
 
   // Handle movement
   const movePlayer = (direction) => {
+    // Check if cancel was selected
+    if (direction.dx === null) {
+      setShowMovementMenu(false);
+      return;
+    }
+    
     const newX = playerX + direction.dx;
     const newY = playerY + direction.dy;
     
@@ -110,9 +118,9 @@ function App() {
     setShowMovementMenu(false);
   };
 
-  // Smooth scrolling for story section (when selected)
+  // Smooth scrolling for story section (when in scroll mode)
   useEffect(() => {
-    if (selectedSection !== 'story') return;
+    if (!isStoryScrollMode) return;
 
     const BASE_VELOCITY = 2;
     const MAX_VELOCITY = 15;
@@ -195,49 +203,74 @@ function App() {
       document.removeEventListener('scrollDown', handleScrollDown, { capture: true });
       document.removeEventListener('scrollUp', handleScrollUp, { capture: true });
     };
-  }, [selectedSection]);
+  }, [isStoryScrollMode]);
 
-  // Handle wheel for section selection and movement menu
+  // Handle wheel for panel navigation and movement menu
   useEffect(() => {
     const handleScroll = (isUp) => {
       if (showMovementMenu) {
-        // Navigate the radial menu
+        // Navigate the movement menu (9 options: 8 directions + cancel)
         setSelectedDirection(prev => {
           if (isUp) {
-            return (prev + 1) % 8;
+            return (prev + 1) % 9;
           } else {
-            return (prev - 1 + 8) % 8;
+            return (prev - 1 + 9) % 9;
           }
         });
-      } else if (selectedSection !== 'story') {
-        // Toggle between map and story sections
-        setSelectedSection(prev => prev === 'map' ? 'story' : 'map');
+      } else if (!isStoryScrollMode) {
+        // Cycle through panels: 0=map, 1=stats, 2=story
+        setSelectedPanel(prev => {
+          if (isUp) {
+            return (prev + 1) % 3;
+          } else {
+            return (prev - 1 + 3) % 3;
+          }
+        });
       }
-      // If story is selected and menu not open, scrolling is handled by the story scroll effect
+      // If in story scroll mode, scrolling is handled by the story scroll effect
     };
 
     const handleScrollDown = (event) => {
-      if (selectedSection !== 'story' || showMovementMenu) {
+      // Only prevent default if we're not in story scroll mode
+      if (!isStoryScrollMode || showMovementMenu) {
         event.preventDefault();
         handleScroll(false);
       }
     };
 
     const handleScrollUp = (event) => {
-      if (selectedSection !== 'story' || showMovementMenu) {
+      // Only prevent default if we're not in story scroll mode
+      if (!isStoryScrollMode || showMovementMenu) {
         event.preventDefault();
         handleScroll(true);
       }
     };
 
+    // Keyboard simulation: Arrow keys trigger scroll events
+    const handleKeyDown = (event) => {
+      if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        // Dispatch custom scrollUp event
+        const scrollEvent = new Event('scrollUp', { bubbles: true, cancelable: true });
+        window.dispatchEvent(scrollEvent);
+      } else if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        // Dispatch custom scrollDown event
+        const scrollEvent = new Event('scrollDown', { bubbles: true, cancelable: true });
+        window.dispatchEvent(scrollEvent);
+      }
+    };
+
     window.addEventListener('scrollDown', handleScrollDown, { passive: false, capture: true });
     window.addEventListener('scrollUp', handleScrollUp, { passive: false, capture: true });
+    document.addEventListener('keydown', handleKeyDown);
 
     return () => {
       window.removeEventListener('scrollDown', handleScrollDown, { capture: true });
       window.removeEventListener('scrollUp', handleScrollUp, { capture: true });
+      document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [selectedSection, showMovementMenu]);
+  }, [selectedPanel, isStoryScrollMode, showMovementMenu]);
 
   // Handle button press (R1 side button)
   useEffect(() => {
@@ -245,39 +278,39 @@ function App() {
       event.preventDefault();
       
       if (showMovementMenu) {
-        // Confirm direction selection
+        // Confirm direction selection in movement menu (or cancel)
         movePlayer(directions[selectedDirection]);
-      } else if (selectedSection === 'map') {
-        // Open movement menu
+      } else if (selectedPanel === 0) {
+        // Map panel: open movement menu
         setShowMovementMenu(true);
         setSelectedDirection(0); // Reset to North
+      } else if (selectedPanel === 2) {
+        // Story panel: toggle scroll mode
+        setIsStoryScrollMode(prev => !prev);
       }
-      // If story section is selected and no menu, do nothing (allow scrolling only)
+      // Stats panel (selectedPanel === 1): do nothing for now
     };
 
-    // Listen for Enter key, Space, and click as button press
+    // Keyboard simulation: Space bar triggers button press
     const handleKeyDown = (event) => {
-      if (event.key === 'Enter' || event.key === ' ') {
-        handleButtonPress(event);
+      if (event.key === ' ' || event.key === 'Enter') {
+        event.preventDefault();
+        // Dispatch custom buttonPress event
+        const buttonEvent = new Event('buttonPress', { bubbles: true, cancelable: true });
+        window.dispatchEvent(buttonEvent);
       }
-    };
-
-    const handleClick = (event) => {
-      handleButtonPress(event);
     };
 
     document.addEventListener('keydown', handleKeyDown);
-    document.addEventListener('click', handleClick);
     
     // R1 button event (if it exists)
     window.addEventListener('buttonPress', handleButtonPress, { passive: false, capture: true });
 
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
-      document.removeEventListener('click', handleClick);
       window.removeEventListener('buttonPress', handleButtonPress, { capture: true });
     };
-  }, [selectedSection, showMovementMenu, selectedDirection, directions, movePlayer]);
+  }, [selectedPanel, showMovementMenu, selectedDirection, directions, movePlayer]);
 
   const mapLines = renderMap();
   const currentTerrain = map[playerY][playerX];
@@ -303,7 +336,7 @@ function App() {
         {/* Top Row - Map and Stats */}
         <div className="top-row">
           {/* Map Section */}
-          <div className={`panel map-panel ${selectedSection === 'map' ? 'selected' : ''}`}>
+          <div className={`panel map-panel ${selectedPanel === 0 && !showMovementMenu ? 'selected' : ''}`}>
             <span className="panel-label">World Map</span>
             <div className="ascii-map">
               {mapLines.map((line, i) => (
@@ -316,7 +349,7 @@ function App() {
           </div>
 
           {/* Stats Panel */}
-          <div className="panel stats-panel">
+          <div className={`panel stats-panel ${selectedPanel === 1 && !showMovementMenu ? 'selected' : ''}`}>
             <span className="panel-label">Status ({moveCount})</span>
             <div className="stats-content">
               <div className="stat-row">
@@ -364,8 +397,8 @@ function App() {
         </div>
 
         {/* Bottom Row - Story Log */}
-        <div className={`panel story-panel ${selectedSection === 'story' ? 'selected' : ''}`}>
-          <span className="panel-label">Event Log ({storyHistory.length})</span>
+        <div className={`panel story-panel ${selectedPanel === 2 && !showMovementMenu && !isStoryScrollMode ? 'selected' : ''} ${isStoryScrollMode ? 'scroll-mode' : ''}`}>
+          <span className="panel-label">Event Log ({storyHistory.length}){isStoryScrollMode ? ' [SCROLL]' : ''}</span>
           <div className="story-container" ref={storyContainerRef}>
             {storyHistory.map((entry, i) => (
               <div key={i} className="story-entry">

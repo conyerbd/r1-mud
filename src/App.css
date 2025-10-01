@@ -91,9 +91,16 @@ body::before {
   position: relative;
   padding: 0;
   margin-bottom: 3px;
+  transition: border-color 0.2s, border-width 0.1s;
 }
 
+/* Highlighted when scrolling through panels */
 .panel.selected {
+  border-color: #aaaaaa;
+}
+
+/* Story panel in scroll mode */
+.panel.scroll-mode {
   border-color: #ffffff;
   border-width: 2px;
 }
@@ -312,7 +319,7 @@ body::before {
 
 .direction-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 4px;
   padding: 12px 6px 6px 6px;
 }
