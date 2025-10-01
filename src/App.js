@@ -5,7 +5,7 @@ import { generateMap, getTileStory, TERRAIN, MAP_SIZE } from './mapData';
 function App() {
   // Game state
   const [map] = useState(generateMap());
-  const [playerX, setPlayerX] = useState(7); // Start in the middle
+  const [playerX, setPlayerX] = useState(7); // Start in the Middle
   const [playerY, setPlayerY] = useState(7);
   const [selectedSection, setSelectedSection] = useState('map'); // 'map' or 'story'
   const [showMovementMenu, setShowMovementMenu] = useState(false);

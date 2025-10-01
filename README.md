@@ -23,7 +23,7 @@ A text-based MUD (Multi-User Dungeon) adventure game designed for the Rabbit R1 
 
 ### Movement
 1. Use the wheel to select the MAP section (it will be highlighted)
-2. Press the side button to open the radial direction menu
+2. Press the side button to open the radial direction menu.
 3. Use the wheel to select a direction (N, NE, E, SE, S, SW, W, NW)
 4. Press the side button again to move in that direction
 
