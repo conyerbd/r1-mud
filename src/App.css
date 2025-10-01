@@ -9,7 +9,7 @@ body {
   font-family: 'Courier New', Courier, monospace;
   font-size: 11px;
   line-height: 1.3;
-  color: #ff9933;
+  color: #ffffff;
   background: #000000;
   overflow: hidden;
 }
@@ -53,12 +53,12 @@ body::before {
   width: 240px;
   height: 300px;
   background: #000000;
-  color: #ff9933;
+  color: #ffffff;
   overflow: hidden;
   outline: none;
   display: flex;
   flex-direction: column;
-  text-shadow: 0 0 2px rgba(255, 153, 51, 0.5);
+  text-shadow: 0 0 2px rgba(255, 255, 255, 0.5);
 }
 
 /* Version number */
@@ -67,42 +67,42 @@ body::before {
   top: 2px;
   left: 2px;
   font-size: 7px;
-  color: #cc6600;
+  color: #ffffff;
   z-index: 9999;
   opacity: 0.7;
 }
 
 /* Section common styles */
 .map-section, .story-section {
-  border: 3px double #ff9933;
+  border: 3px double #ffffff;
   margin: 4px;
   padding: 0;
   background: #000000;
   transition: border-color 0.2s, box-shadow 0.2s;
-  box-shadow: 0 0 5px rgba(255, 153, 51, 0.3);
+  box-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
   position: relative;
 }
 
 .map-section.selected, .story-section.selected {
-  border-color: #ffaa00;
-  box-shadow: 0 0 15px rgba(255, 153, 51, 0.8), inset 0 0 10px rgba(255, 153, 51, 0.2);
+  border-color: #ffffff;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.8), inset 0 0 10px rgba(255, 255, 255, 0.2);
   animation: pulse-border 2s ease-in-out infinite;
 }
 
 @keyframes pulse-border {
-  0%, 100% { box-shadow: 0 0 15px rgba(255, 153, 51, 0.8), inset 0 0 10px rgba(255, 153, 51, 0.2); }
-  50% { box-shadow: 0 0 20px rgba(255, 153, 51, 1), inset 0 0 15px rgba(255, 153, 51, 0.3); }
+  0%, 100% { box-shadow: 0 0 15px rgba(255, 255, 255, 0.8), inset 0 0 10px rgba(255, 255, 255, 0.2); }
+  50% { box-shadow: 0 0 20px rgba(255, 255, 255, 1), inset 0 0 15px rgba(255, 255, 255, 0.3); }
 }
 
 .section-title {
   font-size: 10px;
   font-weight: bold;
   color: #000000;
-  background: #ff9933;
+  background: #ffffff;
   text-align: center;
   margin: 0;
   padding: 3px;
-  border-bottom: 2px solid #ffaa00;
+  border-bottom: 2px solid #ffffff;
   letter-spacing: 1px;
   text-shadow: none;
 }
@@ -119,7 +119,7 @@ body::before {
   text-align: center;
   padding: 8px;
   background: #000000;
-  border: 1px solid #663300;
+  border: 1px solid #999999;
   margin: 4px;
   letter-spacing: 2px;
   box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
@@ -127,18 +127,18 @@ body::before {
 
 .map-line {
   white-space: pre;
-  color: #ff9933;
-  text-shadow: 0 0 3px rgba(255, 153, 51, 0.6);
+  color: #ffffff;
+  text-shadow: 0 0 3px rgba(255, 255, 255, 0.6);
 }
 
 .map-legend {
   font-size: 8px;
   text-align: center;
-  color: #cc7722;
+  color: #ffffff;
   margin: 0 4px 4px 4px;
   padding: 3px;
   background: #0a0a0a;
-  border: 1px solid #663300;
+  border: 1px solid #999999;
 }
 
 /* Story Section */
@@ -155,7 +155,7 @@ body::before {
   overflow-x: hidden;
   padding: 6px;
   background: #000000;
-  border: 1px solid #663300;
+  border: 1px solid #999999;
   scroll-behavior: auto;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
@@ -166,7 +166,7 @@ body::before {
 .story-entry {
   margin-bottom: 10px;
   padding-bottom: 8px;
-  border-bottom: 1px dashed #663300;
+  border-bottom: 1px dashed #999999;
 }
 
 .story-entry:last-child {
@@ -174,18 +174,18 @@ body::before {
 }
 
 .story-header {
-  color: #ffaa00;
+  color: #ffffff;
   font-size: 9px;
   margin-bottom: 4px;
   font-weight: bold;
-  text-shadow: 0 0 3px rgba(255, 170, 0, 0.6);
+  text-shadow: 0 0 3px rgba(255, 255, 255, 0.6);
 }
 
 .story-content {
-  color: #ff9933;
+  color: #ffffff;
   font-size: 10px;
   line-height: 1.4;
-  text-shadow: 0 0 2px rgba(255, 153, 51, 0.4);
+  text-shadow: 0 0 2px rgba(255, 255, 255, 0.4);
 }
 
 /* Custom scrollbar */
@@ -198,12 +198,12 @@ body::before {
 }
 
 .story-container::-webkit-scrollbar-thumb {
-  background: #663300;
+  background: #999999;
   border-radius: 2px;
 }
 
 .story-container::-webkit-scrollbar-thumb:hover {
-  background: #cc6600;
+  background: #ffffff;
 }
 
 /* Movement Menu Overlay */
@@ -222,9 +222,9 @@ body::before {
 
 .movement-menu {
   background: #000000;
-  border: 4px double #ff9933;
+  border: 4px double #ffffff;
   padding: 0;
-  box-shadow: 0 0 30px rgba(255, 153, 51, 0.9), inset 0 0 20px rgba(255, 153, 51, 0.1);
+  box-shadow: 0 0 30px rgba(255, 255, 255, 0.9), inset 0 0 20px rgba(255, 255, 255, 0.1);
   min-width: 180px;
 }
 
@@ -232,11 +232,11 @@ body::before {
   text-align: center;
   font-weight: bold;
   color: #000000;
-  background: #ff9933;
+  background: #ffffff;
   font-size: 11px;
   margin: 0;
   padding: 5px;
-  border-bottom: 2px solid #ffaa00;
+  border-bottom: 2px solid #ffffff;
   letter-spacing: 1px;
 }
 
@@ -252,8 +252,8 @@ body::before {
   padding: 8px;
   text-align: center;
   background: #000000;
-  border: 2px solid #663300;
-  color: #cc7722;
+  border: 2px solid #999999;
+  color: #ffffff;
   font-size: 10px;
   font-weight: bold;
   transition: all 0.15s;
@@ -262,10 +262,10 @@ body::before {
 }
 
 .direction-option.selected {
-  background: #ff9933;
-  border-color: #ffaa00;
+  background: #ffffff;
+  border-color: #ffffff;
   color: #000000;
-  box-shadow: 0 0 15px rgba(255, 153, 51, 0.9), inset 0 0 10px rgba(255, 170, 0, 0.5);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.9), inset 0 0 10px rgba(255, 255, 255, 0.5);
   transform: scale(1.05);
   text-shadow: none;
 }
@@ -273,11 +273,11 @@ body::before {
 .menu-hint {
   text-align: center;
   font-size: 8px;
-  color: #ff9933;
+  color: #ffffff;
   font-style: italic;
   padding: 4px;
   background: #000000;
-  border-top: 1px solid #663300;
+  border-top: 1px solid #999999;
   margin: 0;
 }
 
