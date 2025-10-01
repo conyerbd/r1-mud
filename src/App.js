@@ -11,6 +11,7 @@ function App() {
   const [showMovementMenu, setShowMovementMenu] = useState(false);
   const [selectedDirection, setSelectedDirection] = useState(0); // 0-7 for 8 directions
   const [storyHistory, setStoryHistory] = useState([]);
+  const [moveCount, setMoveCount] = useState(0);
   
   // Refs for scrolling
   const storyContainerRef = useRef(null);
@@ -40,6 +41,22 @@ function App() {
     { name: 'W', dx: -1, dy: 0 },
     { name: 'NW', dx: -1, dy: -1 }
   ];
+
+  // Count terrain types in visible area
+  const getTerrainStats = () => {
+    const stats = { F: 0, P: 0, R: 0, M: 0 };
+    const viewRadius = 2;
+    
+    for (let y = playerY - viewRadius; y <= playerY + viewRadius; y++) {
+      for (let x = playerX - viewRadius; x <= playerX + viewRadius; x++) {
+        if (x >= 0 && x < MAP_SIZE && y >= 0 && y < MAP_SIZE) {
+          const terrain = map[y][x];
+          if (stats[terrain] !== undefined) stats[terrain]++;
+        }
+      }
+    }
+    return stats;
+  };
 
   // Render the ASCII map
   const renderMap = () => {
@@ -73,6 +90,7 @@ function App() {
     if (newX >= 0 && newX < MAP_SIZE && newY >= 0 && newY < MAP_SIZE) {
       setPlayerX(newX);
       setPlayerY(newY);
+      setMoveCount(prev => prev + 1);
       
       // Add new story entry
       const newStory = getTileStory(newX, newY, map[newY][newX]);
@@ -263,33 +281,96 @@ function App() {
 
   const mapLines = renderMap();
   const currentTerrain = map[playerY][playerX];
+  const terrainStats = getTerrainStats();
+  const currentTime = new Date().toLocaleTimeString('en-US', { hour12: false });
+
+  // Get terrain name
+  const getTerrainName = (char) => {
+    const names = { F: 'FOREST', P: 'PLAINS', R: 'RIVER', M: 'MOUNTAIN' };
+    return names[char] || 'UNKNOWN';
+  };
 
   return (
     <div className="viewport">
       <div className="App">
-        <div className="version">v1.0</div>
-        
-        {/* Map Section */}
-        <div className={`map-section ${selectedSection === 'map' ? 'selected' : ''}`}>
-          <div className="section-title">MAP [{playerX},{playerY}]</div>
-          <div className="ascii-map">
-            {mapLines.map((line, i) => (
-              <div key={i} className="map-line">{line}</div>
-            ))}
+        {/* Header */}
+        <div className="header">
+          <div className="header-left">MUD-R1 v1.0</div>
+          <div className="header-center">TERMINAL MONITOR</div>
+          <div className="header-right">{currentTime}</div>
+        </div>
+
+        {/* Top Row - Map and Stats */}
+        <div className="top-row">
+          {/* Map Section */}
+          <div className={`panel map-panel ${selectedSection === 'map' ? 'selected' : ''}`}>
+            <span className="panel-label">World Map</span>
+            <div className="ascii-map">
+              {mapLines.map((line, i) => (
+                <div key={i} className="map-line">{line}</div>
+              ))}
+            </div>
+            <div className="map-footer">
+              Position: ({playerX},{playerY})
+            </div>
           </div>
-          <div className="map-legend">
-            F=Forest  P=Plains  R=River  @=You
+
+          {/* Stats Panel */}
+          <div className="panel stats-panel">
+            <span className="panel-label">Status ({moveCount})</span>
+            <div className="stats-content">
+              <div className="stat-row">
+                <span className="stat-label">TERRAIN:</span>
+                <span className="stat-value">{getTerrainName(currentTerrain)}</span>
+              </div>
+              <div className="stat-row">
+                <span className="stat-label">MOVES:</span>
+                <span className="stat-value">{moveCount}</span>
+              </div>
+              <div className="stat-divider"></div>
+              <div className="stat-section-title">Visible Area:</div>
+              <div className="terrain-bars">
+                <div className="terrain-bar">
+                  <span className="terrain-label">F</span>
+                  <div className="bar-container">
+                    <div className="bar-fill" style={{ width: `${(terrainStats.F / 25) * 100}%` }}></div>
+                  </div>
+                  <span className="terrain-count">{terrainStats.F}</span>
+                </div>
+                <div className="terrain-bar">
+                  <span className="terrain-label">P</span>
+                  <div className="bar-container">
+                    <div className="bar-fill" style={{ width: `${(terrainStats.P / 25) * 100}%` }}></div>
+                  </div>
+                  <span className="terrain-count">{terrainStats.P}</span>
+                </div>
+                <div className="terrain-bar">
+                  <span className="terrain-label">R</span>
+                  <div className="bar-container">
+                    <div className="bar-fill" style={{ width: `${(terrainStats.R / 25) * 100}%` }}></div>
+                  </div>
+                  <span className="terrain-count">{terrainStats.R}</span>
+                </div>
+                <div className="terrain-bar">
+                  <span className="terrain-label">M</span>
+                  <div className="bar-container">
+                    <div className="bar-fill" style={{ width: `${(terrainStats.M / 25) * 100}%` }}></div>
+                  </div>
+                  <span className="terrain-count">{terrainStats.M}</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Story Section */}
-        <div className={`story-section ${selectedSection === 'story' ? 'selected' : ''}`}>
-          <div className="section-title">STORY LOG</div>
+        {/* Bottom Row - Story Log */}
+        <div className={`panel story-panel ${selectedSection === 'story' ? 'selected' : ''}`}>
+          <span className="panel-label">Event Log ({storyHistory.length})</span>
           <div className="story-container" ref={storyContainerRef}>
             {storyHistory.map((entry, i) => (
               <div key={i} className="story-entry">
                 <div className="story-header">
-                  [{entry.timestamp}] {entry.title}
+                  [{i + 1}] {entry.timestamp} - {entry.title}
                 </div>
                 <div className="story-content">{entry.content}</div>
               </div>
@@ -297,12 +378,17 @@ function App() {
           </div>
         </div>
 
+        {/* Legend Bar */}
+        <div className="legend-bar">
+          F=Forest | P=Plains | R=River | M=Mountain | @=You
+        </div>
+
         {/* Movement Menu Popup */}
         {showMovementMenu && (
           <div className="movement-menu-overlay">
             <div className="movement-menu">
-              <div className="menu-title">SELECT DIRECTION</div>
-              <div className="radial-menu">
+              <span className="panel-label">Movement Direction</span>
+              <div className="direction-grid">
                 {directions.map((dir, i) => (
                   <div
                     key={i}
@@ -312,7 +398,9 @@ function App() {
                   </div>
                 ))}
               </div>
-              <div className="menu-hint">Press button to move</div>
+              <div className="menu-footer">
+                Select direction and press button to move
+              </div>
             </div>
           </div>
         )}
@@ -322,4 +410,3 @@ function App() {
 }
 
 export default App;
-
