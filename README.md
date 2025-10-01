@@ -42,3 +42,17 @@ npm start
 ## Development
 
 Built with React for the Rabbit R1's 240x320 pixel display.
+
+## Deployment
+
+This project is configured to automatically deploy to GitHub Pages when you push to the `main` branch. The GitHub Actions workflow will:
+
+1. Build the React app
+2. Deploy to GitHub Pages
+
+To enable GitHub Pages for your repository:
+1. Go to your repository settings
+2. Navigate to Pages
+3. Under "Build and deployment", select "GitHub Actions" as the source
+
+The app will be available at: `https://[your-username].github.io/r1-mud/`
