@@ -295,20 +295,18 @@ function App() {
     const handleKeyDown = (event) => {
       if (event.key === ' ' || event.key === 'Enter') {
         event.preventDefault();
-        // Dispatch custom buttonPress event
-        const buttonEvent = new Event('buttonPress', { bubbles: true, cancelable: true });
-        window.dispatchEvent(buttonEvent);
+        handleButtonPress(event);
       }
     };
 
     document.addEventListener('keydown', handleKeyDown);
-    
-    // R1 button event (if it exists)
-    window.addEventListener('buttonPress', handleButtonPress, { passive: false, capture: true });
+
+    // R1 side button
+    window.addEventListener('sideClick', handleButtonPress, { passive: false, capture: true });
 
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('buttonPress', handleButtonPress, { capture: true });
+      window.removeEventListener('sideClick', handleButtonPress, { capture: true });
     };
   }, [selectedPanel, showMovementMenu, selectedDirection, directions, movePlayer]);
 
